@@ -17,4 +17,3 @@ class LocalPortsProvider
 public:
     static QList<LocalPortEntry> query(QString *error = nullptr);
 };
-

@@ -33,13 +33,14 @@ public:
 
 signals:
     void hostUpdated(const NetworkHostResult &host);
+    void hostResponsive(const QString &address, qint64 responseTimeMs);
     void progressChanged(qint64 completed, qint64 total);
     void finished(bool cancelled);
 
 private:
     void launchMore();
     void startJob(qint64 index);
-    void completeJob(QTcpSocket *socket, bool isOpen);
+    void completeJob(QTcpSocket *socket, bool isOpen, bool isResponsive);
     void resolveHostName(const QString &address);
 
     QVector<QHostAddress> m_addresses;
