@@ -1,0 +1,10 @@
+/build/
+/cmake-build-*/
+/.qt/
+/.qtcreator/
+/CMakeUserPresets.json
+*.user
+*.autosave
+.DS_Store
+Thumbs.db
+
