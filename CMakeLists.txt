@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(NetPeek VERSION 0.1.0 LANGUAGES CXX)
+project(NetPeek VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,6 +15,10 @@ qt_add_executable(NetPeek
     src/MainWindow.h
     src/network/Ipv4Range.cpp
     src/network/Ipv4Range.h
+    src/network/HostDiscovery.cpp
+    src/network/HostDiscovery.h
+    src/network/NetworkInterfaces.cpp
+    src/network/NetworkInterfaces.h
     src/network/NetworkScanner.cpp
     src/network/NetworkScanner.h
     src/ports/LocalPortsProvider.cpp
@@ -37,4 +41,3 @@ install(TARGETS NetPeek
     BUNDLE DESTINATION .
     RUNTIME DESTINATION bin
 )
-
