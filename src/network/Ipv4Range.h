@@ -13,4 +13,3 @@ public:
 private:
     static bool toIpv4(const QString &text, quint32 *value);
 };
-

@@ -1,6 +1,7 @@
 #include "NetworkScanner.h"
 
 #include <QHostInfo>
+#include <QDateTime>
 #include <QTcpSocket>
 #include <QTimer>
 #include <algorithm>
@@ -66,24 +67,25 @@ void NetworkScanner::startJob(const qint64 index)
     socket->setProperty("netpeek.address", address);
     socket->setProperty("netpeek.port", port);
     socket->setProperty("netpeek.completed", false);
+    socket->setProperty("netpeek.started", QDateTime::currentMSecsSinceEpoch());
     ++m_activeJobs;
 
     connect(socket, &QTcpSocket::connected, this, [this, socket] {
-        completeJob(socket, true);
+        completeJob(socket, true, true);
     });
-    connect(socket, &QTcpSocket::errorOccurred, this, [this, socket](QAbstractSocket::SocketError) {
-        completeJob(socket, false);
+    connect(socket, &QTcpSocket::errorOccurred, this, [this, socket](QAbstractSocket::SocketError error) {
+        completeJob(socket, false, error == QAbstractSocket::ConnectionRefusedError);
     });
     connect(timer, &QTimer::timeout, this, [this, socket] {
         socket->abort();
-        completeJob(socket, false);
+        completeJob(socket, false, false);
     });
 
     timer->start(m_timeoutMs);
     socket->connectToHost(address, port);
 }
 
-void NetworkScanner::completeJob(QTcpSocket *socket, const bool isOpen)
+void NetworkScanner::completeJob(QTcpSocket *socket, const bool isOpen, const bool isResponsive)
 {
     if (socket->property("netpeek.completed").toBool())
         return;
@@ -91,6 +93,17 @@ void NetworkScanner::completeJob(QTcpSocket *socket, const bool isOpen)
 
     const QString address = socket->property("netpeek.address").toString();
     const quint16 port = socket->property("netpeek.port").value<quint16>();
+    if (isResponsive && !m_cancelled) {
+        const qint64 elapsed = QDateTime::currentMSecsSinceEpoch()
+                             - socket->property("netpeek.started").toLongLong();
+        emit hostResponsive(address, elapsed);
+        const bool firstResponse = !m_results.contains(address);
+        auto &host = m_results[address];
+        host.address = address;
+        if (firstResponse)
+            emit hostUpdated(host);
+        resolveHostName(address);
+    }
     if (isOpen && !m_cancelled) {
         auto &host = m_results[address];
         host.address = address;
