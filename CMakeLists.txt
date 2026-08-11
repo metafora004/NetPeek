@@ -31,6 +31,7 @@ target_include_directories(NetPeek PRIVATE src)
 if(WIN32)
     target_link_libraries(NetPeek PRIVATE iphlpapi ws2_32)
     target_compile_definitions(NetPeek PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+    set_target_properties(NetPeek PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
 if(APPLE)
